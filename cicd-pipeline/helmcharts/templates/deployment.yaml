@@ -1,0 +1,151 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "charts-frontend-platform.fullname" . }}
+  namespace: {{ .Values.namespace }}
+  labels:
+    name: {{ include "charts-frontend-platform.fullname" . }}
+    {{- include "charts-frontend-platform.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "charts-frontend-platform.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "charts-frontend-platform.labels" . | nindent 8 }}
+        {{- with .Values.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "charts-frontend-platform.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.service.port }}
+              protocol: TCP
+          env:
+          - name: NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Values.config.name }}-credentials
+                key: next-public-stripe-publishable-key
+          - name: SENTRY_DSN
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Values.config.name }}-credentials
+                key: sentry-dsn
+          - name: NEXT_PUBLIC_ZAPSIGN_URL
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Values.config.name }}-credentials
+                key: next-public-zapsign-url
+          - name: SENTRY_AUTH_TOKEN
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Values.config.name }}-credentials
+                key: sentry-auth-token
+          - name: NEXT_PUBLIC_BRDID_URL
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Values.config.name }}-credentials
+                key: next-public-brdid-url
+          - name: NEXT_PUBLIC_CNPJWS_TOKEN
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Values.config.name }}-credentials
+                key: next-public-cnpjws-token
+          - name: NEXT_PUBLIC_STRIPE_TRIMESTRAL_PRICE_ID
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Values.config.name }}-credentials
+                key: next-public-stripe-trimestral-price-id
+          - name: NEXT_PUBLIC_STRIPE_SEMESTRAL_PRICE_ID
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Values.config.name }}-credentials
+                key: next-public-stripe-semestral-price-id
+          - name: NEXT_PUBLIC_STRIPE_ANUAL_PRICE_ID
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Values.config.name }}-credentials
+                key: next-public-stripe-anual-price-id
+          - name: NEXT_PUBLIC_TTL
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Values.config.name }}-credentials
+                key: next-public-ttl
+          - name: NEXT_PUBLIC_PUSHER_CLUSTER
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Values.config.name }}-credentials
+                key: next-public-pusher-cluster
+          - name: NEXT_PUBLIC_INTERCOM_APP_ID
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Values.config.name }}-credentials
+                key: next-public-intercom-app-id
+          - name: NEXT_PUBLIC_INTERCOM_SECRET_KEY
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Values.config.name }}-credentials
+                key: next-public-intercom-secret-key
+          - name: NEXT_PUBLIC_API_URL
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Values.config.name }}-credentials
+                key: next-public-api-url
+          - name: NEXT_PUBLIC_PUSHER_PUB_KEY
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Values.config.name }}-credentials
+                key: next-public-pusher-pub-key
+          - name: NEXT_PUBLIC_BROADCASTER_URL
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Values.config.name }}-credentials
+                key: next-public-broadcaster-url
+          livenessProbe:
+            {{- toYaml .Values.livenessProbe | nindent 12 }}
+          readinessProbe:
+            {{- toYaml .Values.readinessProbe | nindent 12 }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          {{- with .Values.volumeMounts }}
+          volumeMounts:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+      {{- with .Values.volumes }}
+      volumes:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

@@ -1,0 +1,415 @@
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+
+$bren_grey: #3f3f3f;
+$link_water_light:#e9eef4;
+$glacier:#72B1C7;
+
+//General Definitions
+
+* {
+  font-size: 14px;
+}
+
+
+
+h2 {
+  font-size: 15px;
+  font-weight: bold;
+  opacity: 0.5;
+}
+
+.home h2, .signup h2 {
+  opacity: 1;
+}
+
+input {
+  outline: none!important;
+}
+
+.signup input {
+  padding-bottom: 1vh;
+}
+
+//import bren icons
+.bren-icon {
+  font-family: "bren_icons";
+  font-style: normal;
+  font-weight: normal;
+  speak: never;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  text-decoration: inherit;
+  width: 1em;
+  font-size: 30px;
+  margin-right: .2em;
+  text-align: center;
+ 
+  /* For safety - reset parent styles, that can break glyph codes*/
+  font-variant: normal;
+  text-transform: none;
+ 
+  /* fix buttons height, for twitter bootstrap */
+  line-height: 1em;
+ 
+  /* Animation center compensation - margins should be symmetric */
+  /* remove if not needed */
+  margin-left: .2em;
+  
+  /* You can be more comfortable with increased icons size */
+  /* font-size: 120%; */
+ 
+  /* Font smoothing. That was taken from TWBS */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+ 
+  /* Uncomment for 3D effect */
+  /* text-shadow: 1px 1px 1px rgba(127, 127, 127, 0.3); */
+
+  /* Prevent text selection in icons */
+  -webkit-touch-callout: none; /* iOS Safari */
+  -webkit-user-select: none; /* Safari */
+   -khtml-user-select: none; /* Konqueror HTML */
+     -moz-user-select: none; /* Old versions of Firefox */
+      -ms-user-select: none; /* Internet Explorer/Edge */
+          user-select: none; /* Non-prefixed version, currently */
+}
+
+
+
+:root, :root.light {
+  --foreground-rgb: 0, 0, 0;
+  --background-start-rgb: 214, 219, 220;
+  --background-end-rgb: 255, 255, 255;
+  /** gradients **/
+  --gradient2-rgb-start: 178, 197, 214;
+  --gradient2-rgb-end: 121, 144, 164;
+  --gradient3-rgb-start: 100, 156, 207;
+  --gradient3-rgb-end: 119, 185, 194;
+  --gradient4-rgb-start: 119, 185, 194;
+  --gradient4-rgb-end: 100, 156, 207;
+  /* Home Heading*/
+  --home-headline: url("/home/home-headline-light-img.svg");
+  --border-primary: rgb(var(--gradient4-rgb-start));
+  --color-primary: rgb(var(--gradient4-rgb-start));
+
+  a {
+    color: #72B1C7;
+  }
+  
+
+}
+
+
+  :root.dark {
+    --foreground-rgb: 255, 255, 255;
+    --background-start-rgb: 0, 0, 0;
+    --background-end-rgb: 0, 0, 0;
+      /** gradients **/
+    --gradient2-rgb-start: 33, 33, 33;
+    --gradient2-rgb-end: 20,20,20;
+    --gradient3-rgb-start: 182, 207, 183;
+    --gradient3-rgb-end: 233, 227, 170;
+    --gradient4-rgb-start: 242, 230, 167;
+    --gradient4-rgb-end: 93, 171, 205;
+    /* Home Heading*/
+    --home-headline: url("/home/home-headline-dark-img.svg");
+    --border-primary: rgb(var(--gradient4-rgb-start));
+    --color-primary: rgb(var(--gradient4-rgb-start));
+
+    a {
+      color: #D2DAB0;
+    }
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --foreground-rgb: 255, 255, 255;
+      --background-start-rgb: 0, 0, 0;
+      --background-end-rgb: 0, 0, 0;
+        /** gradients **/
+      --gradient2-rgb-start: 33, 33, 33;
+      --gradient2-rgb-end: 20,20,20;
+      --gradient3-rgb-start: 182, 207, 183;
+      --gradient3-rgb-end: 233, 227, 170;
+      --gradient4-rgb-start: 242, 230, 167;
+      --gradient4-rgb-end: 93, 171, 205;
+      /* Home Heading*/
+      --home-headline: url("/home/home-headline-dark-img.svg");
+      --border-primary: rgb(var(--gradient4-rgb-start));
+      --color-primary: rgb(var(--gradient4-rgb-start));
+
+  }
+}
+  
+
+
+body {
+  color: rgb(var(--foreground-rgb));
+}
+
+/* Home Headline */
+.home-headline {
+  background-image: var(--home-headline);
+  background-repeat: no-repeat;
+  background-size: contain;
+  }
+  
+
+/* ANIMATIONS */
+
+.loadComponent {
+  opacity: 0;
+  animation: loadComponent 0.5s ease-in-out forwards;
+}
+
+@keyframes loadComponent {
+  0% {
+      opacity: 0;
+      transform: translatey(-10px);
+  }
+  100% {
+      opacity: 1;
+      transform: translatey(0px);
+  }
+}
+
+.unloadComponent {
+  opacity: 1;
+  animation: unloadComponent 0.05s linear forwards;
+}
+
+@keyframes unloadComponent {
+  0% {
+      opacity: 1;
+      transform: scale(1);
+  }
+  99% {
+      opacity: 0;
+      transform: scale(0.9);
+  }
+  100% {
+    display: none;
+  }
+}
+
+.appearElement {
+  opacity: 1;
+  animation: appearElement 0.05s linear forwards;
+  transform: scale(0.9);
+  display: none;
+}
+
+@keyframes appearElement {
+  0% {
+    display: none;
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  1% {
+    display: flex;
+      opacity: 0;
+      transform: scale(0.9);
+  }
+  100% {
+    display: flex;
+      opacity: 1;
+      transform: scale(1);
+  }
+}
+
+/* INPUT HACKS */
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+    background: inherit;
+}
+
+/* HEADINGS */
+
+h1 {
+  font-size: 27px;
+}
+
+/* BUTTONS */
+
+
+
+/*LOADING ICON*/
+
+.lds-roller {
+  position: relative;
+  width: 80px;
+  height: 80px;
+  transform: scale(1.75);
+}
+.lds-roller div {
+  animation: lds-roller 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+  transform-origin: 40px 40px;
+}
+.lds-roller div:after {
+  content: " ";
+  display: block;
+  position: absolute;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: $glacier;
+  margin: -4px 0 0 -4px;
+}
+.lds-roller div:nth-child(1) {
+  animation-delay: -0.036s;
+}
+.lds-roller div:nth-child(1):after {
+  top: 63px;
+  left: 63px;
+}
+.lds-roller div:nth-child(2) {
+  animation-delay: -0.072s;
+}
+.lds-roller div:nth-child(2):after {
+  top: 68px;
+  left: 56px;
+}
+.lds-roller div:nth-child(3) {
+  animation-delay: -0.108s;
+}
+.lds-roller div:nth-child(3):after {
+  top: 71px;
+  left: 48px;
+}
+.lds-roller div:nth-child(4) {
+  animation-delay: -0.144s;
+}
+.lds-roller div:nth-child(4):after {
+  top: 72px;
+  left: 40px;
+}
+.lds-roller div:nth-child(5) {
+  animation-delay: -0.18s;
+}
+.lds-roller div:nth-child(5):after {
+  top: 71px;
+  left: 32px;
+}
+.lds-roller div:nth-child(6) {
+  animation-delay: -0.216s;
+}
+.lds-roller div:nth-child(6):after {
+  top: 68px;
+  left: 24px;
+}
+.lds-roller div:nth-child(7) {
+  animation-delay: -0.252s;
+}
+.lds-roller div:nth-child(7):after {
+  top: 63px;
+  left: 17px;
+}
+.lds-roller div:nth-child(8) {
+  animation-delay: -0.288s;
+}
+.lds-roller div:nth-child(8):after {
+  top: 56px;
+  left: 12px;
+}
+@keyframes lds-roller {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+
+
+/* Loading Bar */
+.LoadingBarHorizontalOverTime {
+  width:100%;
+  height:5px;
+  position: absolute;
+  bottom:0px;
+  left: 0px;
+  background: linear-gradient(
+    to right,
+    rgb(var(--gradient3-rgb-start)),
+    rgb(var(--gradient3-rgb-end)
+  ));
+  animation: horizontalLoadingBar 3.5s linear;
+}
+
+
+@keyframes horizontalLoadingBar {
+  0% {
+    width:0%
+  }
+  100% {
+    width:100%
+
+  }
+}
+
+
+.fadeOutAnimation {
+  opacity: 1;
+  animation: fadeOut 0.5s ease-in-out;
+  animation-fill-mode: forwards;
+  animation-delay: 1s;
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+.fadeInAnimation {
+  opacity: 0;
+  animation: fadeIn 0.5s ease-in-out;
+  animation-fill-mode: forwards;
+  animation-delay: 1s;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.fadeInAnimationNoDelay {
+  opacity: 0;
+  animation: fadeIn 0.25s ease-in-out;
+  animation-fill-mode: forwards;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+
+//audio
+
+audio::-webkit-media-controls-play-button,
+ audio::-webkit-media-controls-panel {
+ color: #fff!important;
+ }
+
+select option {
+  color: initial!important;
+}
