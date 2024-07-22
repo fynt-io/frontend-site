@@ -1,5 +1,5 @@
 
-# <p align="center"><img src='https://wearebren.com/logo/logo-bren-2.svg' width='75'>&nbsp;- Front-end</p>
+# <p align="center"><img src='https://wearebren.com/logo/logo-bren-2.svg' width='75'>&nbsp;- Front-end (Home Page)</p>
 
 <p align="center">
   <img src="https://img.shields.io/badge/Next.js-V14.1.4-000?style=for-the-badge&logo=nextdotjs&logoColor=white"/>
