@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import Button from "../Layout/Buttons/Button";
 
 export const HomeStartScreen = ({
@@ -11,7 +11,6 @@ export const HomeStartScreen = ({
   return (
     <>
       <div
-        style={{ opacity: 50 / scrollPosition }}
         className=" max-w-[768px] w-full text-center flex items-center justify-center flex-col md:mt-[2vh]  mt-[3vh]  px-10 md:px-5"
       >
         <h1 className="loadComponent pb-[0.5vh] text-[4.5vh] leading-[5vh] !font-black bg-gradient-to-r from-glacier to-yellowgreenish inline-block text-transparent bg-clip-text">

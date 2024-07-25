@@ -3,6 +3,7 @@ import BrenIcon from "../Layout/Icons/BrenIcon";
 import Button from "../Layout/Buttons/Button";
 import Logo from "../Layout/Logos/Logo";
 import { BREN_CONSTANTS } from "@/app/constants/constants";
+const platformLink = process.env.NEXT_PUBLIC_FRONTEND_PLATFORM;
 
 export const HomeMenu = () => {
   const [mobileMenuIsOpen, setMobileMenuIsOpen] = useState(false);
@@ -37,7 +38,7 @@ export const HomeMenu = () => {
           <div className="flex flex-col gap-3 w-full ">
           {BREN_CONSTANTS.SHOW_SIGNUP && <div className="w-full pr-[50px] ">
             <Button
-              url={"/signup"}
+              url={`${platformLink}/signup`}
               responsive={false}
               buttonStyle="accent-button-yellow-greenish"
               text="Cadastrar"
@@ -46,7 +47,7 @@ export const HomeMenu = () => {
           </div>}
           {BREN_CONSTANTS.SHOW_LOGIN && <div className="w-full  pr-[50px]">
             <Button
-              url={"/login"}
+              url={`${platformLink}/login`}
               responsive={false}
               buttonStyle="accent-border-button"
               text="Entrar"
@@ -75,7 +76,7 @@ export const HomeMenu = () => {
           <div className="hidden md:flex gap-3">
           {BREN_CONSTANTS.SHOW_LOGIN && <Button
               responsive={false}
-              url={"/login"}
+              url={`${platformLink}/login`}
               buttonStyle="accent-border-button"
               text="Entrar"
               icon="arrow-right"
@@ -83,7 +84,7 @@ export const HomeMenu = () => {
             />}
             {BREN_CONSTANTS.SHOW_SIGNUP && <Button
               responsive={false}
-              url={"/signup"}
+              url={`${platformLink}/signup`}
               buttonStyle="accent-button-yellow-greenish"
               text="Cadastrar"
               className="!h-[45px]  "

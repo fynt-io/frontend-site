@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import BrenIcon from "../Layout/Icons/BrenIcon";
-import PaymentStripe from "./PaymentStripe";
+// import PaymentStripe from "./PaymentStripe";
 import { BREN_PRICE } from "@/app/constants/BrenPrices";
 import { useSearchParams } from "next/navigation";
 import { BrenPriceTier } from "@/app/constants/types";
@@ -462,16 +462,11 @@ const DynamicPlan = ({
 export default function Plans({
   email,
   name,
-  successFunction,
-  company,
-  publicDataCompany,
   sectionTitle = "Escolha seu Plano",
   goToSinup = false,
   company_name = "",
   telefone = "",
-  selectedPlan = null,
-  sizeByScreenProportion = true,
-  discount = false,
+
   seller_id,
 }: {
   email?: string;
@@ -544,7 +539,7 @@ export default function Plans({
         </div>
       )}
 
-      {plan && (
+      {/* {plan && (
         <div className="absolute w-screen  bg-black/50 h-screen top-0 left-0 z-[99] flex items-center justify-center backdrop-blur-lg">
           <div className="overflow-y-auto h-screen w-screen lg:flex items-center justify-center">
             {seller_id && (
@@ -569,7 +564,7 @@ export default function Plans({
             )}
           </div>
         </div>
-      )}
+      )} */}
     </div>
   );
 }
