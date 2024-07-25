@@ -43,13 +43,13 @@ securityContext: {}
 service:
   type: LoadBalancer
   port: 3000
-  # loadBalancerIP: "34.139.118.221"
+  loadBalancerIP: "34.74.77.2"
 
 ingress:
   enabled: false
   className: ""
   annotations: {}
-  # kubernetes.io/ingress.global-static-ip-name: "34.139.118.221"
+  # kubernetes.io/ingress.global-static-ip-name: ""34.74.77.2""
     # kubernetes.io/ingress.class: nginx
     # kubernetes.io/tls-acme: "true"
   hosts:
@@ -60,7 +60,7 @@ ingress:
   tls: 
    - secretName: bren-certificado-tls
      hosts:
-      #  - 34.139.118.221
+      #  - "34.74.77.2"
 
 resources:
   limits:
