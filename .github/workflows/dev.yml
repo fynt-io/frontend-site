@@ -1,0 +1,121 @@
+name: Build and Deploy to GKE
+
+on:
+  pull_request:
+    branches:
+      - "main"
+
+permissions:
+  id-token: write
+  contents: read
+
+concurrency:
+  cancel-in-progress: true
+  group: gke-deploy
+
+env:
+  PROJECT_ID: shared-429520
+  CLUSTER_PROJECT_ID: development-398118
+  GAR_LOCATION: us-east1
+  GKE_CLUSTER: bren-dev
+  GKE_ZONE: us-east1-b
+  DEPLOYMENT_NAME: frontend-site-dev
+  REPOSITORY: frontend-site
+  IMAGE: frontend-site
+
+jobs:
+  build_and_push:
+    if: ${{ github.event.pull_request.head.ref == 'dev' || startsWith(github.event.pull_request.head.ref, 'hotfix/') }}
+    runs-on: ubuntu-latest
+    outputs:
+      image_tag: ${{ steps.build_image.outputs.image_tag }}
+      image_repository: ${{ steps.build_image.outputs.image_repository }}
+      version: ${{ steps.extract_version.outputs.version }}
+      commit_sha: ${{ steps.extract_version.outputs.commit_sha }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Log in to Google Cloud
+        uses: google-github-actions/auth@v1
+        with:
+          credentials_json: ${{ secrets.GCP_CREDENTIALS }}
+
+      - name: Set up Google Cloud SDK
+        uses: google-github-actions/setup-gcloud@v1
+        with:
+          version: 'latest'
+
+      - name: Configure docker for Google Artifact Registry
+        run: gcloud auth configure-docker ${GAR_LOCATION}-docker.pkg.dev
+
+      - name: Extract version and commit SHA
+        id: extract_version
+        run: |
+          version=$(grep '^version:' cicd-pipeline/helmcharts/Chart.yaml | cut -d ' ' -f 2)
+          commit_sha=$(echo $GITHUB_SHA | cut -c1-7)
+          echo "version=$version" >> $GITHUB_ENV
+          echo "commit_sha=$commit_sha" >> $GITHUB_ENV
+          echo "::set-output name=version::$version"
+          echo "::set-output name=commit_sha::$commit_sha"
+
+      - name: Build and push Docker image
+        id: build_image
+        env:
+          VERSION: ${{ steps.extract_version.outputs.version }}
+          COMMIT_SHA: ${{ steps.extract_version.outputs.commit_sha }}
+        run: |
+          image_repository="${GAR_LOCATION}-docker.pkg.dev/${PROJECT_ID}/${REPOSITORY}/${IMAGE}"
+          image_tag="${image_repository}:${VERSION}-${COMMIT_SHA}"
+          echo "Building image with tag: $image_tag"
+          docker build -t $image_tag .
+          docker push $image_tag
+          echo "::set-output name=image_tag::$image_tag"
+          echo "::set-output name=image_repository::$image_repository"
+
+  deploy:
+    needs: build_and_push
+    runs-on: ubuntu-latest
+    env:
+      ARGOCD_AUTH_TOKEN: ${{ secrets.ARGOCD_AUTH_TOKEN }}
+      IMAGE_REPOSITORY: ${{ needs.build_and_push.outputs.image_repository }}
+      VERSION: ${{ needs.build_and_push.outputs.version }}
+      COMMIT_SHA: ${{ needs.build_and_push.outputs.commit_sha }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up ArgoCD CLI
+        uses: clowdhaus/argo-cd-action@main
+        with:
+          version: 2.6.7
+
+      - name: Add SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan github.com >> ~/.ssh/known_hosts
+
+      - name: Deploy to ArgoCD
+        run: |
+          argocd app create --upsert \
+            --server argocd.wearebren.com \
+            --name ${DEPLOYMENT_NAME} \
+            --project default \
+            --helm-set image.repository=${IMAGE_REPOSITORY} \
+            --helm-set image.tag=${VERSION}-${COMMIT_SHA} \
+            --dest-name gke_${CLUSTER_PROJECT_ID}_${GKE_ZONE}_${GKE_CLUSTER} \
+            --repo git@github.com:we-are-bren/${REPOSITORY}.git \
+            --path cicd-pipeline/helmcharts \
+            --values-literal-file cicd-pipeline/helmcharts/values.yaml \
+            --dest-namespace ${REPOSITORY} \
+            --sync-option CreateNamespace=true \
+            --sync-policy automated \
+            --insecure

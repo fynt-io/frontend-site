@@ -1,8 +1,8 @@
-# Default values for charts-frontend-platform.
+# Default values for charts-frontend-site.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
-namespace: frontend-platform
+namespace: frontend-site
 replicaCount: 1
 
 image:
@@ -49,6 +49,7 @@ ingress:
   enabled: false
   className: ""
   annotations: {}
+  kubernetes.io/ingress.global-static-ip-name: "34.139.118.221"
     # kubernetes.io/ingress.class: nginx
     # kubernetes.io/tls-acme: "true"
   hosts:
@@ -59,7 +60,7 @@ ingress:
   tls: 
    - secretName: bren-certificado-tls
      hosts:
-       - 34.139.118.221 
+       - 34.139.118.221
 
 resources:
   limits:
@@ -115,19 +116,5 @@ DSN_SENTRY: "https://263e2b0943474ebfbfbaed8f1fc6b4e1@o4505924050485248.ingest.u
 
 config:
   name: config
-  nextPublicStripePublishableKey: "pk_test_51NlHmoLoDNUBfNKt0WMfrW9EkXqp3hNSn0MWps7wVUVP3bRSqxX1dErXpbpZflFzNQdBnN1P6cDny73qfYWJQmQu00R7VbHf5N"
-  sentryDns: "https://738e6494156ae6998db2f9eceb9389af@o4505924050485248.ingest.sentry.io/4505942408232960"
-  nextPublicZapSignUrl: "https://sandbox.app.zapsign.com.br"
-  sentryAuthToken: "98735e711cfe2e360805129ee395801aecd9706e1fb1552e084cf0d94c9148f0"
-  nextPublicBrdidUrl: "https://us-central1-dev-ava-378413.cloudfunctions.net/webhook-brdid-dev"
-  nextPublicCnpjwsToken: "Ff82YdG8PQ4xVySWvlQ6ILURifFHso4oVXhcUPNiB19f"
-  nextPublicStripeTrimestralPriceId: "price_1NvRe4LoDNUBfNKt6TK8q0Vj"
-  nextPublicStripeSemestralPriceId: "price_1NvRepLoDNUBfNKtQ5lzjG6F"
-  nextPublicStripeAnualPriceId: "price_1NvRfILoDNUBfNKto36BOEUA"
-  nextPublicTtl: "30"
-  nextPublicPusherCluster: "us3"
-  nextPublicIntercomAppId: "aabsmwpb"
-  nextPublicIntercomSecretKey: "VMcP-1DjuSXaoAvvvJF5uk7CnZtqmx92V4NkOtgY"
-  nextPublicapiUrl: "https://dev.ninja.wearebren.com/api"
-  nextPublicpusherPubKey: "1613a06350b718a445d1"
-  nextPublicBroadcasterUrl: "https://node-broadcaster-dvs6h7egla-uc.a.run.app"
+  nextPublicapiUrl: "http://platform.dev.wearebren.com:8000/api"
+  nextPublicFrontendPlatform: "http://frontend.dev.wearebren.com:3000/" # NEXT_PUBLIC_FRONT_END_PLATFORM
