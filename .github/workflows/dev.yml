@@ -22,8 +22,8 @@ env:
   DEPLOYMENT_NAME: frontend-site-dev
   REPOSITORY: frontend-site
   IMAGE: frontend-site
-  GCS_BUCKET: image_tag
-
+  GCS_BUCKET: staging_promotion_instance
+  
 jobs:
   build_and_push:
     if: ${{ github.event.pull_request.head.ref == 'dev' || startsWith(github.event.pull_request.head.ref, 'hotfix/') }}

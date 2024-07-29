@@ -20,7 +20,8 @@ env:
   DEPLOYMENT_NAME: frontend-site-staging
   REPOSITORY: frontend-site
   IMAGE: frontend-site
-  GCS_BUCKET: image_tag
+  STG_GCS_BUCKET: staging_promotion_instance
+  PRD_GCS_BUCKET: production_promotion_instance
 
 jobs:
   promote_to_staging:
@@ -45,7 +46,7 @@ jobs:
 
       - name: Download image tag from GCS
         run: |
-          gsutil cp gs://${{ env.GCS_BUCKET }}/image_tag.txt .
+          gsutil cp gs://${{ env.STG_GCS_BUCKET }}/image_tag.txt .
 
       - name: Verify image tag downloaded
         run: |
@@ -85,7 +86,11 @@ jobs:
       - name: Sync Application
         run: |
           argocd app sync ${DEPLOYMENT_NAME} --server argocd.wearebren.com --insecure
+          
+      - name: Save image tag for production promotion
+        run: |
+          gsutil cp image-tag.txt gs://${{ env.PRD_GCS_BUCKET }}/image-tag.txt
 
       - name: Delete image tag from GCS
         run: |
-          gsutil rm gs://${{ env.GCS_BUCKET }}/image_tag.txt
+          gsutil rm gs://${{ env.STG_GCS_BUCKET }}/image_tag.txt
