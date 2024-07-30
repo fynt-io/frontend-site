@@ -23,7 +23,7 @@ env:
   REPOSITORY: frontend-site
   IMAGE: frontend-site
   GCS_BUCKET: staging_promotion_instance
-  
+
 jobs:
   build_and_push:
     if: ${{ github.event.pull_request.head.ref == 'dev' || startsWith(github.event.pull_request.head.ref, 'hotfix/') }}
@@ -86,7 +86,7 @@ jobs:
       - name: Save image tag to GCS
         run: |
           echo "${{ steps.build_image.outputs.image_tag }}" > image_tag.txt
-          gsutil cp image_tag.txt gs://${{ env.GCS_BUCKET }}/image_tag.txt
+          gsutil cp image_tag.txt gs://${{ env.GCS_BUCKET }}/${{ env.REPOSITORY }}/image_tag.txt
 
   deploy:
     needs: build_and_push

@@ -46,11 +46,15 @@ jobs:
 
       - name: Download image tag from GCS
         run: |
-          gsutil cp gs://${{ env.STG_GCS_BUCKET }}/image_tag.txt .
+          gsutil cp gs://${{ env.STG_GCS_BUCKET }}/${{ env.REPOSITORY }}/image_tag.txt .
 
       - name: Verify image tag downloaded
         run: |
           cat image_tag.txt
+
+      - name: List files in current directory (debugging step)
+        run: |
+          ls -l
 
       - name: Set up ArgoCD CLI
         uses: clowdhaus/argo-cd-action@main
@@ -86,11 +90,11 @@ jobs:
       - name: Sync Application
         run: |
           argocd app sync ${DEPLOYMENT_NAME} --server argocd.wearebren.com --insecure
-          
+
       - name: Save image tag for production promotion
         run: |
-          gsutil cp image-tag.txt gs://${{ env.PRD_GCS_BUCKET }}/image-tag.txt
+          gsutil cp image_tag.txt gs://${{ env.PRD_GCS_BUCKET }}/${{ env.REPOSITORY }}/image_tag.txt          
 
       - name: Delete image tag from GCS
         run: |
-          gsutil rm gs://${{ env.STG_GCS_BUCKET }}/image_tag.txt
+          gsutil rm gs://${{ env.STG_GCS_BUCKET }}/${{ env.REPOSITORY }}/image_tag.txt
