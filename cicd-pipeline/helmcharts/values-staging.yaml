@@ -41,9 +41,9 @@ securityContext: {}
   # runAsUser: 1000
 
 service:
-  type: LoadBalancer
+  type: NodePort
   port: 3000
-  loadBalancerIP: "34.173.191.82"
+  # loadBalancerIP: "34.173.191.82"
 
 ingress:
   enabled: false
