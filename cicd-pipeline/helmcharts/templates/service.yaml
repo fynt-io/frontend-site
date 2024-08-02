@@ -5,6 +5,7 @@ metadata:
   namespace: {{ .Values.namespace }}
   labels:
     name: {{ include "charts-frontend-site.fullname" . }}
+    {{- include "charts-frontend-site.labels" . | nindent 4 }}
 spec:
   selector:
     {{- include "charts-frontend-site.selectorLabels" . | nindent 4 }}
