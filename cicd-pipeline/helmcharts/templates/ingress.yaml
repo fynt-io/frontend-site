@@ -4,7 +4,7 @@ metadata:
   name: frontend-site-staging
   namespace: frontend-site
   labels:
-    name: { { include "charts-frontend-site.fullname" . } }
+    name: {{ include "charts-frontend-site.fullname" . }}
   annotations:
     kubernetes.io/ingress.class: "gce"
 spec:
