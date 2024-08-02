@@ -46,7 +46,7 @@ service:
   # loadBalancerIP: "34.173.191.82"
 
 ingress:
-  host: "staging.site.wearebren.com"
+  host: "site.staging.wearebren.com"
 
 resources:
   limits:
