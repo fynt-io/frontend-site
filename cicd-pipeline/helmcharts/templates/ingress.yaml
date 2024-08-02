@@ -1,25 +1,24 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: frontend-site-staging 
+  name: frontend-site-staging
   namespace: frontend-site
-	labels:
-    name: {{ include "charts-frontend-site.fullname" . }}
-    {{- include "charts-frontend-site.labels" . | nindent 4 }}
+  labels:
+    name: { { include "charts-frontend-site.fullname" . } }
   annotations:
     kubernetes.io/ingress.class: "gce"
 spec:
   rules:
-  - host: frontend.staging.wearebren.com
-    http:
-      paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: frontend-site-staging
-            port:
-              number: 80
+    - host: frontend.staging.wearebren.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: frontend-site-staging
+                port:
+                  number: 80
 
 # {{- if .Values.ingress.enabled -}}
 # {{- $fullName := include "charts-frontend-site.fullname" . -}}
