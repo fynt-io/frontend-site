@@ -10,10 +10,13 @@ spec:
   selector:
     {{- include "charts-frontend-site.selectorLabels" . | nindent 4 }}
   ports:
-  - protocol: TCP
+  - name: http
+    protocol: TCP
     port: 80
     targetPort: 3000
-  - protocol: TCP
+  - name: https
+    protocol: TCP
     port: 443
     targetPort: 3000
   type: ClusterIP
+

@@ -9,7 +9,7 @@ metadata:
     kubernetes.io/ingress.class: "gce"
 spec:
   rules:
-    - host: staging.site.wearebren.com
+    - host: {{ .Values.ingress.hosts.host }}
       http:
         paths:
           - path: /
