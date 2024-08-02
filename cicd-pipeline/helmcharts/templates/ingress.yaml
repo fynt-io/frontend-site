@@ -1,8 +1,8 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: frontend-site-staging
-  namespace: frontend-site
+  name: {{ include "charts-frontend-site.fullname" . }}
+  namespace: {{ .Values.namespace }}
   labels:
     name: {{ include "charts-frontend-site.fullname" . }} 
   annotations:
