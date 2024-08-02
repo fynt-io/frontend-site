@@ -1,19 +1,39 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "charts-frontend-site.fullname" . }}
+  name: {{ include "charts-frontend-platform.fullname" . }}
   namespace: {{ .Values.namespace }}
   labels:
-    name: {{ include "charts-frontend-site.fullname" . }}
-    {{- include "charts-frontend-site.labels" . | nindent 4 }}
+    name: {{ include "charts-frontend-platform.fullname" . }}
+    {{- include "charts-frontend-platform.labels" . | nindent 4 }}
 spec:
-  type: {{ .Values.service.type }}
-  ports:
-    - port: {{ .Values.service.port }}
-      targetPort: {{ .Values.service.port }}
-      protocol: TCP
   selector:
-    {{- include "charts-frontend-site.selectorLabels" . | nindent 4 }}
-  {{- if .Values.service.loadBalancerIP }}
-  loadBalancerIP: {{ .Values.service.loadBalancerIP }}
-  {{- end }}
+    {{- include "charts-frontend-platform.selectorLabels" . | nindent 4 }}
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 3000
+  - protocol: TCP
+    port: 443
+    targetPort: 3000
+  type: ClusterIP
+
+# apiVersion: v1
+# kind: Service
+# metadata:
+#   name: {{ include "charts-frontend-site.fullname" . }}
+#   namespace: {{ .Values.namespace }}
+#   labels:
+#     name: {{ include "charts-frontend-site.fullname" . }}
+#     {{- include "charts-frontend-site.labels" . | nindent 4 }}
+# spec:
+#   type: {{ .Values.service.type }}
+#   ports:
+#     - port: {{ .Values.service.port }}
+#       targetPort: {{ .Values.service.port }}
+#       protocol: TCP
+#   selector:
+#     {{- include "charts-frontend-site.selectorLabels" . | nindent 4 }}
+#   {{- if .Values.service.loadBalancerIP }}
+#   loadBalancerIP: {{ .Values.service.loadBalancerIP }}
+#   {{- end }}
