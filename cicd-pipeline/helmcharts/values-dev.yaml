@@ -21,7 +21,7 @@ service:
   port: 3000
   loadBalancerIP: 34.74.77.2
 ingress:
-  hosts: site.dev.wearebren.com
+  host: site.dev.wearebren.com
 resources:
   limits:
     cpu: 300m

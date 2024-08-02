@@ -47,7 +47,7 @@ service:
 
 
 ingress:
-  hosts: wearebren.com
+  host: wearebren.com
 
 resources:
   limits:
