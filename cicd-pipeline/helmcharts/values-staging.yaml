@@ -46,13 +46,7 @@ service:
   # loadBalancerIP: "34.173.191.82"
 
 ingress:
-  enabled: true
-  className: ""
-  hosts:
-    - host: staging.site.wearebren.com
-      paths:
-        - path: /
-          pathType: Prefix
+  hosts: staging.site.wearebren.com
 
 resources:
   limits:
