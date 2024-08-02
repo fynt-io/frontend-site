@@ -4,7 +4,7 @@ metadata:
   name: frontend-site-staging
   namespace: frontend-site
   labels:
-    name: {{ include "charts-frontend-site.fullname" . }}
+    name: {{ include "charts-frontend-site.fullname" . }} 
   annotations:
     kubernetes.io/ingress.class: "gce"
 spec:
@@ -16,6 +16,6 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: frontend-site-staging
+                name: {{ include "charts-frontend-site.fullname" . }}
                 port:
                   number: 80
