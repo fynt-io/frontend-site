@@ -1,11 +1,11 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: frontend-platform-staging 
-  namespace: frontend-platform
+  name: frontend-site-staging 
+  namespace: frontend-site
 	labels:
-    name: {{ include "charts-frontend-platform.fullname" . }}
-    {{- include "charts-frontend-platform.labels" . | nindent 4 }}
+    name: {{ include "charts-frontend-site.fullname" . }}
+    {{- include "charts-frontend-site.labels" . | nindent 4 }}
   annotations:
     kubernetes.io/ingress.class: "gce"
 spec:
@@ -17,7 +17,7 @@ spec:
         pathType: Prefix
         backend:
           service:
-            name: frontend-platform-staging
+            name: frontend-site-staging
             port:
               number: 80
 
