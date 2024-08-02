@@ -5,7 +5,6 @@ metadata:
   namespace: {{ .Values.namespace }}
   labels:
     name: {{ include "charts-frontend-site.fullname" . }}
-    {{- include "charts-frontend-site.labels" . | nindent 4 }}
 spec:
   selector:
     {{- include "charts-frontend-site.selectorLabels" . | nindent 4 }}
@@ -17,23 +16,3 @@ spec:
     port: 443
     targetPort: 3000
   type: ClusterIP
-
-# apiVersion: v1
-# kind: Service
-# metadata:
-#   name: {{ include "charts-frontend-site.fullname" . }}
-#   namespace: {{ .Values.namespace }}
-#   labels:
-#     name: {{ include "charts-frontend-site.fullname" . }}
-#     {{- include "charts-frontend-site.labels" . | nindent 4 }}
-# spec:
-#   type: {{ .Values.service.type }}
-#   ports:
-#     - port: {{ .Values.service.port }}
-#       targetPort: {{ .Values.service.port }}
-#       protocol: TCP
-#   selector:
-#     {{- include "charts-frontend-site.selectorLabels" . | nindent 4 }}
-#   {{- if .Values.service.loadBalancerIP }}
-#   loadBalancerIP: {{ .Values.service.loadBalancerIP }}
-#   {{- end }}
