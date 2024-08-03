@@ -1,14 +1,14 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "charts-frontend-platform.fullname" . }}
+  name: {{ include "charts-frontend-site.fullname" . }}
   namespace: {{ .Values.namespace }}
   labels:
-    name: {{ include "charts-frontend-platform.fullname" . }}
-    {{- include "charts-frontend-platform.labels" . | nindent 4 }}
+    name: {{ include "charts-frontend-site.fullname" . }}
+    {{- include "charts-frontend-site.labels" . | nindent 4 }}
 spec:
   selector:
-    {{- include "charts-frontend-platform.selectorLabels" . | nindent 4 }}
+    {{- include "charts-frontend-site.selectorLabels" . | nindent 4 }}
   ports:
   - name: http
     protocol: TCP
