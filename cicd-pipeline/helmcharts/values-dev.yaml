@@ -43,5 +43,5 @@ affinity: {}
 DSN_SENTRY: https://263e2b0943474ebfbfbaed8f1fc6b4e1@o4505924050485248.ingest.us.sentry.io/4507426140585984
 config:
   name: config
-  nextPublicapiUrl: http://platform.dev.wearebren.com:8000/api
-  nextPublicFrontendPlatform: http://frontend.dev.wearebren.com:3000/
+  nextPublicapiUrl: https://platform.dev.wearebren.com/api
+  nextPublicFrontendPlatform: https://frontend.dev.wearebren.com
