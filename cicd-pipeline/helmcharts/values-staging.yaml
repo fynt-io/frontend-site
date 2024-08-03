@@ -1,0 +1,103 @@
+# Default values for charts-frontend-site.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+namespace: frontend-site
+replicaCount: 1
+
+image:
+  repository: us-central1-docker.pkg.dev/staging-400918/frontend-site/frontend-site
+  pullPolicy: Always
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: ""
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Automatically mount a ServiceAccount's API credentials?
+  automount: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+podAnnotations: {}
+podLabels: {}
+
+podSecurityContext: {}
+  # fsGroup: 2000
+
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+service:
+  type: NodePort
+  port: 3000
+  # loadBalancerIP: "34.173.191.82"
+
+ingress:
+  host: "site.staging.wearebren.com"
+
+resources:
+  limits:
+    cpu: 300m
+    memory: 1Gi
+  requests:
+    cpu: 100m
+    memory: 256Mi
+
+readinessProbe:
+  httpGet:
+    path: /
+    port: 3000
+  initialDelaySeconds: 30
+  periodSeconds: 5
+livenessProbe:
+  httpGet:
+    path: /
+    port: 3000
+  initialDelaySeconds: 30
+  periodSeconds: 5
+
+autoscaling:
+  enabled: true
+  minReplicas: 1
+  maxReplicas: 15
+  targetCPUUtilizationPercentage: 85
+  targetMemoryUtilizationPercentage: 85
+
+# Additional volumes on the output Deployment definition.
+volumes: []
+# - name: foo
+#   secret:
+#     secretName: mysecret
+#     optional: false
+
+# Additional volumeMounts on the output Deployment definition.
+volumeMounts: []
+# - name: foo
+#   mountPath: "/etc/foo"
+#   readOnly: true
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+DSN_SENTRY: "https://263e2b0943474ebfbfbaed8f1fc6b4e1@o4505924050485248.ingest.us.sentry.io/4507426140585984"
+
+config:
+  name: config
+  nextPublicapiUrl: "https://platform.staging.wearebren.com/api"
+  nextPublicFrontendPlatform: "https://frontend.staging.wearebren.com/login" # NEXT_PUBLIC_FRONT_END_PLATFORM

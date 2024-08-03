@@ -1,0 +1,58 @@
+namespace: frontend-site
+replicaCount: 1
+image:
+  repository: us-central1-docker.pkg.dev/staging-400918/frontend-site/frontend-site
+  pullPolicy: Always
+  tag: ''
+imagePullSecrets: []
+nameOverride: ''
+fullnameOverride: ''
+serviceAccount:
+  create: true
+  automount: true
+  annotations: {}
+  name: ''
+podAnnotations: {}
+podLabels: {}
+podSecurityContext: {}
+securityContext: {}
+service:
+  type: NodePort
+  port: 3000
+ingress:
+  host: "site.dev.wearebren.com"
+resources:
+  limits:
+    cpu: 300m
+    memory: 1Gi
+  requests:
+    cpu: 100m
+    memory: 256Mi
+readinessProbe:
+  httpGet:
+    path: /
+    port: 3000
+  initialDelaySeconds: 30
+  periodSeconds: 5
+livenessProbe:
+  httpGet:
+    path: /
+    port: 3000
+  initialDelaySeconds: 30
+  periodSeconds: 5
+autoscaling:
+  enabled: true
+  minReplicas: 1
+  maxReplicas: 15
+  targetCPUUtilizationPercentage: 85
+  targetMemoryUtilizationPercentage: 85
+volumes: []
+volumeMounts: []
+nodeSelector: {}
+tolerations: []
+affinity: {}
+DSN_SENTRY: https://263e2b0943474ebfbfbaed8f1fc6b4e1@o4505924050485248.ingest.us.sentry.io/4507426140585984
+config:
+  name: config
+  nextPublicapiUrl: https://platform.dev.wearebren.com/api
+  nextPublicFrontendPlatform: "https://frontend.dev.wearebren.com/login"
