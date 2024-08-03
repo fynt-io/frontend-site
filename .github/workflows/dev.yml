@@ -22,7 +22,6 @@ env:
   DEPLOYMENT_NAME: frontend-site-dev
   REPOSITORY: frontend-site
   IMAGE: frontend-site
-  GCS_BUCKET: staging_promotion_instance
 
 jobs:
   build_and_push:
@@ -30,7 +29,6 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       image_tag: ${{ steps.build_image.outputs.image_tag }}
-      image_name: ${{ steps.build_image.outputs.image_name }}
       image_repository: ${{ steps.build_image.outputs.image_repository }}
       version: ${{ steps.extract_version.outputs.version }}
       commit_sha: ${{ steps.extract_version.outputs.commit_sha }}
@@ -74,19 +72,12 @@ jobs:
           COMMIT_SHA: ${{ steps.extract_version.outputs.commit_sha }}
         run: |
           image_repository="${GAR_LOCATION}-docker.pkg.dev/${PROJECT_ID}/${REPOSITORY}/${IMAGE}"
-          image_name="${image_repository}:${VERSION}-${COMMIT_SHA}"
-          image_tag="${VERSION}-${COMMIT_SHA}"
-          echo "Building image with name: $image_name"
-          docker build -t $image_name .
-          docker push $image_name
+          image_tag="${image_repository}:${VERSION}-${COMMIT_SHA}"
+          echo "Building image with tag: $image_tag"
+          docker build -t $image_tag .
+          docker push $image_tag
           echo "::set-output name=image_tag::$image_tag"
-          echo "::set-output name=image_name::$image_name"
           echo "::set-output name=image_repository::$image_repository"
-
-      - name: Save image tag to GCS
-        run: |
-          echo "${{ steps.build_image.outputs.image_tag }}" > image_tag.txt
-          gsutil cp image_tag.txt gs://${{ env.GCS_BUCKET }}/${{ env.REPOSITORY }}/image_tag.txt
 
   deploy:
     needs: build_and_push
@@ -123,7 +114,7 @@ jobs:
             --dest-name gke_${CLUSTER_PROJECT_ID}_${GKE_ZONE}_${GKE_CLUSTER} \
             --repo git@github.com:we-are-bren/${REPOSITORY}.git \
             --path cicd-pipeline/helmcharts \
-            --values-literal-file cicd-pipeline/helmcharts/values-dev.yaml \
+            --values-literal-file cicd-pipeline/helmcharts/values.yaml \
             --dest-namespace ${REPOSITORY} \
             --sync-option CreateNamespace=true \
             --sync-policy automated \

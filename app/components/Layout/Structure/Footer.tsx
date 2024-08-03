@@ -6,6 +6,7 @@ import Link from "next/link";
 import { ThemeSwitcher } from "../Inputs/ThemeSwitcher";
 import { BREN_CONSTANTS } from "@/app/constants/constants";
 import {formatToPhone } from "brazilian-values";
+const platformLink = process.env.NEXT_PUBLIC_FRONTEND_PLATFORM;
 
 export const Footer = ({
   showDarkModeSwitch = true,
@@ -43,7 +44,7 @@ export const Footer = ({
                 <Link href="/signup">Cadastre-se</Link>
               </li> */}
               <li>
-                <Link href="/login">Entrar</Link>
+                <a href={`${platformLink}/login`} target="_blank">Entrar</a>
               </li>
             </ul>
             <ul className="mb-10 lg:mb-0  ml-0 lg:ml-[50px] text-[#ffffff] text-center lg:text-left">
