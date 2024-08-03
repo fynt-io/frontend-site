@@ -17,9 +17,8 @@ podLabels: {}
 podSecurityContext: {}
 securityContext: {}
 service:
-  type: LoadBalancer
+  type: NodePort
   port: 3000
-  loadBalancerIP: 34.74.77.2
 ingress:
   host: "site.dev.wearebren.com"
 resources:
@@ -29,6 +28,18 @@ resources:
   requests:
     cpu: 100m
     memory: 256Mi
+readinessProbe:
+  httpGet:
+    path: /login
+    port: 3000
+  initialDelaySeconds: 30
+  periodSeconds: 5
+livenessProbe:
+  httpGet:
+    path: /login
+    port: 3000
+  initialDelaySeconds: 30
+  periodSeconds: 5
 autoscaling:
   enabled: true
   minReplicas: 1
