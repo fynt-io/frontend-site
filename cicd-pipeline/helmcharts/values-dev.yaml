@@ -30,13 +30,13 @@ resources:
     memory: 256Mi
 readinessProbe:
   httpGet:
-    path: /login
+    path: /
     port: 3000
   initialDelaySeconds: 30
   periodSeconds: 5
 livenessProbe:
   httpGet:
-    path: /login
+    path: /
     port: 3000
   initialDelaySeconds: 30
   periodSeconds: 5
