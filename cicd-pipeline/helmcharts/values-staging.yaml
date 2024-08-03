@@ -100,4 +100,4 @@ DSN_SENTRY: "https://263e2b0943474ebfbfbaed8f1fc6b4e1@o4505924050485248.ingest.u
 config:
   name: config
   nextPublicapiUrl: "https://platform.staging.wearebren.com/api"
-  nextPublicFrontendPlatform: "https://frontend.staging.wearebren.com" # NEXT_PUBLIC_FRONT_END_PLATFORM
+  nextPublicFrontendPlatform: "https://frontend.staging.wearebren.com/login" # NEXT_PUBLIC_FRONT_END_PLATFORM
