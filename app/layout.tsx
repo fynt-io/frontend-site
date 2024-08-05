@@ -118,7 +118,6 @@ export default function RootLayout({
               className="fixed z-[10] top-4 !w-full [ overscroll-behavior: none]"
             ></div> 
             <main>{children}</main>
-            
           </ThemeProvider>
         </body>
       </html>
