@@ -3,13 +3,17 @@ import BrenIcon from "../Layout/Icons/BrenIcon";
 import Button from "../Layout/Buttons/Button";
 import Logo from "../Layout/Logos/Logo";
 import { BREN_CONSTANTS } from "@/app/constants/constants";
-const platformLink = process.env.NEXT_PUBLIC_FRONTEND_PLATFORM;
+import { GetEnvValue } from "@/app/api/env";
 
 export const HomeMenu = () => {
   const [mobileMenuIsOpen, setMobileMenuIsOpen] = useState(false);
+  const [platformLink, setPlatformLink] = useState("");
 
   //press esc to close the mobile menu
   useEffect(() => {
+    GetEnvValue("NEXT_PUBLIC_FRONTEND_PLATFORM").then((res) => {
+      if (res) setPlatformLink(res);
+    });
     const handleEsc = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
         setMobileMenuIsOpen(false);
