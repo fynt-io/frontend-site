@@ -9,7 +9,7 @@ WORKDIR /app
 
 ENV NEXT_PUBLIC_API_URL="https://platform.dev.wearebren.com/api"
 
-ENV NEXT_PUBLIC_FRONTEND_PLATFORM="https://frontend.dev.wearebren.com/"
+ENV NEXT_PUBLIC_FRONTEND_PLATFORM="https://api.dev.wearebren.com/"
 
 COPY . .
 COPY --from=dependencies /app/node_modules ./node_modules
