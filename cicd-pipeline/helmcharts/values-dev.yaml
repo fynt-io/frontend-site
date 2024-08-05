@@ -55,4 +55,4 @@ DSN_SENTRY: https://263e2b0943474ebfbfbaed8f1fc6b4e1@o4505924050485248.ingest.us
 config:
   name: config
   nextPublicapiUrl: https://platform.dev.wearebren.com/api
-  nextPublicFrontendPlatform: "https://api.dev.wearebren.com/login"
+  nextPublicFrontendPlatform: "https://app.dev.wearebren.com"
