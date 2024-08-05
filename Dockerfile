@@ -9,7 +9,7 @@ WORKDIR /app
 
 ENV NEXT_PUBLIC_API_URL_DEV="https://platform.dev.wearebren.com/api"
 ENV NEXT_PUBLIC_API_URL_STAGING="https://platform.staging.wearebren.com/api"
-ENV NEXT_PUBLIC_API_URL_PROD="https://platform.dev.wearebren.com/api"
+ENV NEXT_PUBLIC_API_URL_PROD="https://platform.wearebren.com/api"
 
 ENV NEXT_PUBLIC_FRONTEND_PLATFORM_DEV="https://api.dev.wearebren.com/"
 ENV NEXT_PUBLIC_FRONTEND_PLATFORM_STAGING="https://api.staging.wearebren.com/"
