@@ -6,7 +6,7 @@ import Link from "next/link";
 import { ThemeSwitcher } from "../Inputs/ThemeSwitcher";
 import { BREN_CONSTANTS } from "@/app/constants/constants";
 import {formatToPhone } from "brazilian-values";
-const platformLink = process.env.NEXT_PUBLIC_FRONTEND_PLATFORM;
+import { GetEnvValue } from "@/app/api/env";
 
 export const Footer = ({
   showDarkModeSwitch = true,
@@ -14,8 +14,13 @@ export const Footer = ({
   showDarkModeSwitch?: boolean;
 }) => {
   const [theme, setTheme] = useState("");
+  const [platformLink, setPlatformLink] = useState("");
+  
 
   useEffect(() => {
+    GetEnvValue("NEXT_PUBLIC_FRONTEND_PLATFORM").then((res) => {
+      if (res) setPlatformLink(res);
+    });
     if (typeof window !== "undefined") {
       setTheme(localStorage.getItem("theme") ?? "");
     }
