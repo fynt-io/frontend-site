@@ -11,9 +11,9 @@ ENV NEXT_PUBLIC_API_URL_DEV="https://platform.dev.wearebren.com/api"
 ENV NEXT_PUBLIC_API_URL_STAGING="https://platform.staging.wearebren.com/api"
 ENV NEXT_PUBLIC_API_URL_PROD="https://platform.wearebren.com/api"
 
-ENV NEXT_PUBLIC_FRONTEND_PLATFORM_DEV="https://api.dev.wearebren.com/"
-ENV NEXT_PUBLIC_FRONTEND_PLATFORM_STAGING="https://api.staging.wearebren.com/"
-ENV NEXT_PUBLIC_FRONTEND_PLATFORM_PROD="https://api.wearebren.com/"
+ENV NEXT_PUBLIC_FRONTEND_PLATFORM_DEV="https://app.dev.wearebren.com/"
+ENV NEXT_PUBLIC_FRONTEND_PLATFORM_STAGING="https://app.staging.wearebren.com/"
+ENV NEXT_PUBLIC_FRONTEND_PLATFORM_PROD="https://app.wearebren.com/"
 
 COPY . .
 COPY --from=dependencies /app/node_modules ./node_modules
