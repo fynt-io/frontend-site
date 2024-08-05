@@ -7,7 +7,7 @@ FROM --platform=linux/amd64 node:lts as builder
 
 WORKDIR /app
 
-ENV NEXT_PUBLIC_API_URL="https://platform.wearebren.com/api"
+ENV NEXT_PUBLIC_API_URL="https://platform.dev.wearebren.com/api"
 
 ENV NEXT_PUBLIC_FRONTEND_PLATFORM="https://frontend.dev.wearebren.com/login"
 
