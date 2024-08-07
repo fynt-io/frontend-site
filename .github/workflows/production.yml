@@ -14,9 +14,9 @@ concurrency:
 env:
   PROJECT_ID: shared-429520
   CLUSTER_PROJECT_ID: dev-ava-378413
-  GAR_LOCATION: us-east4
+  GAR_LOCATION: us-east1
   GKE_CLUSTER: bren-prod
-  GKE_ZONE: us-east4-a
+  GKE_ZONE: us-east1
   DEPLOYMENT_NAME: frontend-site-production
   REPOSITORY: frontend-site
   IMAGE: frontend-site
