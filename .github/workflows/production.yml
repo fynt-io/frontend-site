@@ -21,6 +21,7 @@ env:
   REPOSITORY: frontend-site
   IMAGE: frontend-site
   PRD_GCS_BUCKET: production_promotion_instance
+  ARGOCD_SERVER: argocd.wearebren.com
 
 jobs:
   promote_to_production:
@@ -78,12 +79,9 @@ jobs:
             --values-literal-file cicd-pipeline/helmcharts/values-production.yaml \
             --dest-namespace ${REPOSITORY} \
             --sync-option CreateNamespace=true \
-            --sync-policy automated \
+            --sync-policy none \
             --insecure
-
-      - name: Sync Application
-        run: |
-          argocd app sync ${DEPLOYMENT_NAME} --server argocd.wearebren.com --insecure
+          argocd app sync ${DEPLOYMENT_NAME} --server $ARGOCD_SERVER --insecure
 
       - name: Delete image tag from production GCS
         run: |
