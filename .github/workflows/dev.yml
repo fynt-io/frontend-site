@@ -23,6 +23,7 @@ env:
   REPOSITORY: frontend-site
   IMAGE: frontend-site
   GCS_BUCKET: staging_promotion_instance
+  ARGOCD_SERVER: argocd.wearebren.com
 
 jobs:
   build_and_push:
@@ -126,5 +127,6 @@ jobs:
             --values-literal-file cicd-pipeline/helmcharts/values-dev.yaml \
             --dest-namespace ${REPOSITORY} \
             --sync-option CreateNamespace=true \
-            --sync-policy automated \
+            --sync-policy none \
             --insecure
+          argocd app sync ${DEPLOYMENT_NAME} --server $ARGOCD_SERVER --insecure
