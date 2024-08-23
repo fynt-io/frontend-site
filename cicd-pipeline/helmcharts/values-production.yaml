@@ -41,8 +41,18 @@ securityContext: {}
   # runAsUser: 1000
 
 service:
-  type: NodePort
-  port: 3000
+  type: ClusterIP
+  ports:
+    http:
+      port: 30
+      targetPort: 3000
+    metrics:
+      port: 3000
+      targetPort: 3000
+  annotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/path: "/api/metrics"
+    prometheus.io/port: "3000"
 
 ingress:
   host: "wearebren.com"
@@ -59,22 +69,22 @@ readinessProbe:
   httpGet:
     path: /
     port: 3000
-  initialDelaySeconds: 30
-  periodSeconds: 5
+  initialDelaySeconds: 40
+  periodSeconds: 150
 livenessProbe:
   httpGet:
     path: /
     port: 3000
-  initialDelaySeconds: 30
-  periodSeconds: 5
+  initialDelaySeconds: 40
+  periodSeconds: 150
 
 autoscaling:
   enabled: true
   minReplicas: 1
   maxReplicas: 15
-  targetCPUUtilizationPercentage: 85
-  targetMemoryUtilizationPercentage: 85
-
+  targetCPUUtilizationPercentage: 90
+  targetMemoryUtilizationPercentage: 90
+  
 # Additional volumes on the output Deployment definition.
 volumes: []
 # - name: foo
