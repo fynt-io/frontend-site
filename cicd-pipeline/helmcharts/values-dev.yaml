@@ -16,11 +16,24 @@ podAnnotations: {}
 podLabels: {}
 podSecurityContext: {}
 securityContext: {}
+
 service:
-  type: NodePort
-  port: 3000
+  type: ClusterIP
+  ports:
+    http:
+      port: 30
+      targetPort: 3000
+    metrics:
+      port: 3000
+      targetPort: 3000
+  annotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/path: "/api/metrics"
+    prometheus.io/port: "3000"
+
 ingress:
   host: "dev.wearebren.com"
+
 resources:
   limits:
     cpu: 300m
@@ -28,24 +41,27 @@ resources:
   requests:
     cpu: 100m
     memory: 256Mi
+
 readinessProbe:
   httpGet:
     path: /
     port: 3000
-  initialDelaySeconds: 30
-  periodSeconds: 5
+  initialDelaySeconds: 40
+  periodSeconds: 150
 livenessProbe:
   httpGet:
     path: /
     port: 3000
-  initialDelaySeconds: 30
-  periodSeconds: 5
+  initialDelaySeconds: 40
+  periodSeconds: 150
+
 autoscaling:
   enabled: true
   minReplicas: 1
   maxReplicas: 15
-  targetCPUUtilizationPercentage: 85
-  targetMemoryUtilizationPercentage: 85
+  targetCPUUtilizationPercentage: 90
+  targetMemoryUtilizationPercentage: 90
+
 volumes: []
 volumeMounts: []
 nodeSelector: {}
