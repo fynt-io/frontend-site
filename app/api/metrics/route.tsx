@@ -2,21 +2,23 @@ import { register, collectDefaultMetrics } from 'prom-client';
 
 collectDefaultMetrics();
 
-export async function GET(req: any, res:any){
-    try {
-        const metrics = await register.metrics();
-        return Response.json({ metrics })
-    } catch (err:any) {
-        return Response.json({ err })
-    }
+export async function GET(req: any, res: any) {
+  try {
+    const metrics = await register.metrics();
+    res.setHeader('Content-Type', register.contentType);
+    res.status(200).send(metrics);
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
 }
 
-export async function POST(req: any, res:any){
+export async function POST(req: any, res: any) {
+  try {
+    const metrics = await register.metrics();
     res.setHeader('Content-Type', register.contentType);
-    try {
-        const metrics = await register.metrics();
-        return Response.json({ metrics })
-    } catch (err:any) {
-        return Response.json({ err })
-    }
+    res.status(200).send(metrics);
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
 }
+
