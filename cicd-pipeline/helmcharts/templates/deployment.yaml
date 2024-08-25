@@ -40,7 +40,10 @@ spec:
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
             - name: http
-              containerPort: {{ .Values.service.port }}
+              containerPort: {{ .Values.service.ports.http.targetPort }}
+              protocol: TCP
+            - name: metrics
+              containerPort: {{ .Values.service.ports.metrics.targetPort }}
               protocol: TCP
           env:
           - name: NEXT_PUBLIC_API_URL

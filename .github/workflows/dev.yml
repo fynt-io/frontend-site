@@ -122,7 +122,7 @@ jobs:
             --helm-set image.repository=${IMAGE_REPOSITORY} \
             --helm-set image.tag=${VERSION}-${COMMIT_SHA} \
             --dest-name gke_${CLUSTER_PROJECT_ID}_${GKE_ZONE}_${GKE_CLUSTER} \
-            --repo git@github.com:we-are-bren/${REPOSITORY}.git \
+            --repo git@github.com:fynt-io/${REPOSITORY}.git \
             --path cicd-pipeline/helmcharts \
             --values-literal-file cicd-pipeline/helmcharts/values-dev.yaml \
             --dest-namespace ${REPOSITORY} \

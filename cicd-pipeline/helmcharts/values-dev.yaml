@@ -21,7 +21,7 @@ service:
   type: ClusterIP
   ports:
     http:
-      port: 30
+      port: 80
       targetPort: 3000
     metrics:
       port: 3000
