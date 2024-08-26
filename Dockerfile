@@ -18,6 +18,7 @@ ENV NEXT_PUBLIC_FRONTEND_PLATFORM_PROD="https://app.wearebren.com/"
 COPY . .
 COPY --from=dependencies /app/node_modules ./node_modules
 
+RUN yarn add prom-client
 RUN yarn build
 
 FROM --platform=linux/amd64 node:lts as runner
