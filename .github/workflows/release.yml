@@ -27,7 +27,6 @@ env:
 
 jobs:
   build_and_push:
-    if: ${{ github.event.pull_request.head.ref == 'dev' || startsWith(github.event.pull_request.head.ref, 'hotfix/') }}
     runs-on: ubuntu-latest
     outputs:
       image_tag: ${{ steps.build_image.outputs.image_tag }}
