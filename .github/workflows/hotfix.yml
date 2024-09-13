@@ -1,0 +1,165 @@
+name: Hotfix Deployment
+
+on:
+  push:
+    tags:
+      - 'hotfix/**'
+
+env:
+  PROJECT_ID: shared-429520
+  DEV_CLUSTER_PROJECT_ID: development-398118
+  STAGING_CLUSTER_PROJECT_ID: staging-400918
+  PROD_CLUSTER_PROJECT_ID: dev-ava-378413
+  GAR_LOCATION: us-east1
+  ARGOCD_SERVER: argocd.wearebren.com
+  DEPLOYMENT_NAME: frontend-site
+  REPOSITORY: frontend-site
+  IMAGE: frontend-site
+
+jobs:
+  build_and_push:
+    runs-on: ubuntu-latest
+    outputs:
+      image_tag: ${{ steps.build_image.outputs.image_tag }}
+      image_name: ${{ steps.build_image.outputs.image_name }}
+      image_repository: ${{ steps.build_image.outputs.image_repository }}
+      version: ${{ steps.extract_version.outputs.version }}
+      commit_sha: ${{ steps.extract_version.outputs.commit_sha }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Log in to Google Cloud
+        uses: google-github-actions/auth@v1
+        with:
+          credentials_json: ${{ secrets.GCP_CREDENTIALS }}
+
+      - name: Set up Google Cloud SDK
+        uses: google-github-actions/setup-gcloud@v1
+        with:
+          version: 'latest'
+
+      - name: Configure docker for Google Artifact Registry
+        run: gcloud auth configure-docker ${GAR_LOCATION}-docker.pkg.dev
+
+      - name: Extract version and commit SHA
+        id: extract_version
+        run: |
+          version=$(grep '^version:' cicd-pipeline/helmcharts/Chart.yaml | cut -d ' ' -f 2)
+          commit_sha=$(echo $GITHUB_SHA | cut -c1-7)
+          echo "version=$version" >> $GITHUB_ENV
+          echo "commit_sha=$commit_sha" >> $GITHUB_ENV
+          echo "::set-output name=version::$version"
+          echo "::set-output name=commit_sha::$commit_sha"
+
+      - name: Build and push Docker image
+        id: build_image
+        env:
+          VERSION: ${{ steps.extract_version.outputs.version }}
+          COMMIT_SHA: ${{ steps.extract_version.outputs.commit_sha }}
+        run: |
+          image_repository="${GAR_LOCATION}-docker.pkg.dev/${PROJECT_ID}/${REPOSITORY}/${IMAGE}"
+          image_name="${image_repository}:${VERSION}-${COMMIT_SHA}"
+          image_tag="${VERSION}-${COMMIT_SHA}"
+          echo "Building image with name: $image_name"
+          docker build -t $image_name .
+          docker push $image_name
+          echo "::set-output name=image_tag::$image_tag"
+          echo "::set-output name=image_name::$image_name"
+          echo "::set-output name=image_repository::$image_repository"
+  
+  hotfix_deploy:
+    needs: build_and_push
+    runs-on: ubuntu-latest
+    env:
+      ARGOCD_AUTH_TOKEN: ${{ secrets.ARGOCD_AUTH_TOKEN }}
+      IMAGE_REPOSITORY: ${{ needs.build_and_push.outputs.image_repository }}
+      IMAGE_TAG: ${{ needs.build_and_push.outputs.image_tag }}
+      VERSION: ${{ needs.build_and_push.outputs.version }}
+      COMMIT_SHA: ${{ needs.build_and_push.outputs.commit_sha }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+        
+      - name: Extract tag information
+        id: extract_tag
+        shell: bash
+        run: |
+          tag="${GITHUB_REF#refs/tags/}"
+          echo "Tag: $tag"
+          echo "Extracting environment from tag..."
+          
+          if [[ "$tag" == *"dev" ]]; then
+            echo "env=dev" >> $GITHUB_ENV
+          elif [[ "$tag" == *"staging" ]]; then
+            echo "env=staging" >> $GITHUB_ENV
+          elif [[ "$tag" == *"production" ]]; then
+            echo "env=production" >> $GITHUB_ENV
+          else
+            echo "Unknown environment. Failing."
+            exit 1
+          fi
+
+      - name: Set environment-specific variables
+        shell: bash
+        run: |
+          source $GITHUB_ENV
+          echo "Env loaded: $env"
+          if [[ "$env" == "dev" ]]; then
+            echo "CLUSTER_PROJECT_ID=${DEV_CLUSTER_PROJECT_ID}" >> $GITHUB_ENV
+            echo "GKE_CLUSTER=bren-dev" >> $GITHUB_ENV
+            echo "GKE_ZONE=us-east1-b" >> $GITHUB_ENV
+            echo "DEPLOYMENT_NAME=${DEPLOYMENT_NAME}-dev" >> $GITHUB_ENV
+          elif [[ "$env" == "staging" ]]; then
+            echo "CLUSTER_PROJECT_ID=${STAGING_CLUSTER_PROJECT_ID}" >> $GITHUB_ENV
+            echo "GKE_CLUSTER=bren-staging" >> $GITHUB_ENV
+            echo "GKE_ZONE=us-central1" >> $GITHUB_ENV
+            echo "DEPLOYMENT_NAME=${DEPLOYMENT_NAME}-staging" >> $GITHUB_ENV
+          elif [[ "$env" == "production" ]]; then
+            echo "CLUSTER_PROJECT_ID=${PROD_CLUSTER_PROJECT_ID}" >> $GITHUB_ENV
+            echo "GKE_CLUSTER=bren-prod" >> $GITHUB_ENV
+            echo "GKE_ZONE=us-east1" >> $GITHUB_ENV
+            echo "DEPLOYMENT_NAME=${DEPLOYMENT_NAME}-production" >> $GITHUB_ENV
+          else
+            echo "Invalid env. Failing."
+            exit 1
+          fi
+
+      - name: Set up ArgoCD CLI
+        uses: clowdhaus/argo-cd-action@main
+        with:
+          version: 2.6.7
+
+      - name: Add SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan github.com >> ~/.ssh/known_hosts
+
+      - name: Deploy Hotfix to ArgoCD
+        run: |
+          argocd app create --upsert \
+            --server $ARGOCD_SERVER \
+            --name ${DEPLOYMENT_NAME} \
+            --project default \
+            --helm-set image.repository=${IMAGE_REPOSITORY} \
+            --helm-set image.tag=${VERSION}-${COMMIT_SHA} \
+            --dest-name gke_${CLUSTER_PROJECT_ID}_${GKE_ZONE}_${GKE_CLUSTER} \
+            --repo git@github.com:fynt-io/${REPOSITORY}.git \
+            --path cicd-pipeline/helmcharts \
+            --values-literal-file cicd-pipeline/helmcharts/values-${env}.yaml \
+            --dest-namespace ${REPOSITORY} \
+            --sync-option CreateNamespace=true \
+            --sync-policy none \
+            --insecure
+
+      - name: Sync Application
+        run: |
+          argocd app sync ${DEPLOYMENT_NAME} --server $ARGOCD_SERVER --insecure
