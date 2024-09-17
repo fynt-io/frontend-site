@@ -94,6 +94,9 @@ jobs:
           tag="${GITHUB_REF#refs/tags/}"
           echo "Tag: $tag"
           echo "Extracting environment from tag..."
+
+          env=$(echo "$tag" | awk -F'-' '{print $NF}')
+          echo "Environment extracted: $env"
           
           if [[ "$tag" == *"dev" ]]; then
             echo "env=dev" >> $GITHUB_ENV
