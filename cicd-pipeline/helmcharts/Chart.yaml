@@ -3,15 +3,15 @@ name: frontend-site
 description: A Helm chart for Bren's site
 type: application
 
-# Fellow, developer: please increment the tag above to the upcoming value: 
+# Fellow, developer: please increment the tag above to the upcoming value:
 # *** Versions are expected to follow Semantic Versioning (https://semver.org/) ***
 
-version: 0.0.1
+version: 1.0.0
 
 # This is the version number of the application being deployed. This version number should be
 # incremented each time you make changes to the application. Versions are not expected to
 # follow Semantic Versioning. They should reflect the version the application is using.
 # It is recommended to use it with quotes.
 
-appVersion: "0.0.1"
+appVersion: "1.0.0"
 # The name of the chart
