@@ -14,6 +14,7 @@
     "lint.fix": "eslint --fix --ext .js ./"
   },
   "dependencies": {
+    "@datadog/browser-rum": "^5.29.1",
     "@sentry/nextjs": "^7.74.1",
     "@stripe/react-stripe-js": "^2.3.1",
     "@stripe/stripe-js": "^2.1.7",
@@ -33,6 +34,7 @@
     "consultar-cnpj": "^1.0.18",
     "crypto": "^1.0.1",
     "date-fns": "^3.6.0",
+    "dd-trace": "^5.25.0",
     "driver.js": "^1.3.1",
     "eslint": "8.48.0",
     "eslint-config-next": "^14.0.4",
