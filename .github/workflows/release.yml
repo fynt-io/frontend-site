@@ -1,6 +1,7 @@
 name: Build and Deploy to GKE
 
 on:
+  workflow_dispatch:
   pull_request:
     branches:
       - "release"
