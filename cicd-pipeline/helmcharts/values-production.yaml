@@ -80,10 +80,10 @@ livenessProbe:
 
 autoscaling:
   enabled: true
-  minReplicas: 1
+  minReplicas: 3
   maxReplicas: 15
-  targetCPUUtilizationPercentage: 90
-  targetMemoryUtilizationPercentage: 90
+  targetCPUUtilizationPercentage: 70
+  targetMemoryUtilizationPercentage: 70
   
 # Additional volumes on the output Deployment definition.
 volumes: []
@@ -110,3 +110,13 @@ config:
   name: config
   nextPublicapiUrl: "https://platform.wearebren.com/api"
   nextPublicFrontendPlatform: "https://app.wearebren.com" # NEXT_PUBLIC_FRONT_END_PLATFORM
+
+podLabels:
+  tags.datadoghq.com/env: "production"
+  tags.datadoghq.com/service: "frontend-site-production"
+  admission.datadoghq.com/enabled: "true"
+
+podAnnotations:
+  admission.datadoghq.com/python-lib.version: v2.13.2
+
+targetSystem: "linux"
