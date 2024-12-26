@@ -1,7 +1,7 @@
 namespace: frontend-site
 replicaCount: 1
 image:
-  repository: us-central1-docker.pkg.dev/staging-400918/frontend-site/frontend-site
+  repository: us-central1-docker.pkg.dev/shared-429520/frontend-site/frontend-site
   pullPolicy: Always
   tag: ''
 imagePullSecrets: []

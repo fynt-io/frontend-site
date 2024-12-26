@@ -1,6 +1,14 @@
 
 # <p align="center"><img src='https://wearebren.com/logo/logo-bren-2.svg' width='75'>&nbsp;- Front-end (Home Page)</p>
 
+[![Promote to Production](https://github.com/fynt-io/communication-service/actions/workflows/production.yml/badge.svg)](https://github.com/fynt-io/communication-service/actions/workflows/production.yml)
+[![Promote to Staging](https://github.com/fynt-io/communication-service/actions/workflows/staging.yml/badge.svg)](https://github.com/fynt-io/communication-service/actions/workflows/staging.yml)
+[![Deploy to Development](https://github.com/fynt-io/communication-service/actions/workflows/dev.yml/badge.svg)](https://github.com/fynt-io/communication-service/actions/workflows/dev.yml)
+[![Sync Branches After Hotfix/Bugfix](https://github.com/fynt-io/communication-service/actions/workflows/post-fix-sync-branch.yml/badge.svg)](https://github.com/fynt-io/communication-service/actions/workflows/post-fix-sync-branch.yml)
+[![Dependabot Updates](https://github.com/fynt-io/communication-service/actions/workflows/dependabot/dependabot-updates/badge.svg)](https://github.com/fynt-io/communication-service/actions/workflows/dependabot/dependabot-updates)
+
+Para mais informações sobre o fluxo de *deploy*, consulte nossa [documentação de deploy](./docs/deploy_flow.md).
+
 <p align="center">
   <img src="https://img.shields.io/badge/Next.js-V14.1.4-000?style=for-the-badge&logo=nextdotjs&logoColor=white"/>
   <img src="https://img.shields.io/badge/ReactJs-V18.2.21-61DAFB?logo=react&logoColor=white&style=for-the-badge"/>

@@ -1,0 +1,158 @@
+name: Sync Branches After Hotfix/Bugfix
+
+on:
+  push:
+    branches:
+      - main
+      - staging
+    paths-ignore:
+      - "**.md"
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+concurrency:
+  group: sync-branches-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  sync-branches:
+    runs-on: ubuntu-latest
+    if: contains(github.event.head_commit.message, 'hotfix') || contains(github.event.head_commit.message, 'bugfix')
+    steps:
+      - name: Generate token
+        id: generate_token
+        uses: tibdex/github-app-token@v2
+        with:
+          app_id: ${{ secrets.APP_ID }}
+          private_key: ${{ secrets.APP_PRIVATE_KEY }}
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ steps.generate_token.outputs.token }}
+          ref: ${{ github.ref }}
+
+      - name: Configure Git
+        run: |
+          git config user.name "branch-sync-bot[bot]"
+          git config user.email "branch-sync-bot[bot]@users.noreply.github.com"
+
+      - name: Sync branches from main
+        if: github.ref == 'refs/heads/main'
+        env:
+          GH_TOKEN: ${{ steps.generate_token.outputs.token }}
+        run: |
+          sync_branch() {
+            local branch=$1
+            echo "::group::Syncing $branch with main..."
+            
+            git fetch origin $branch || {
+              echo "❌ Branch $branch não existe"
+              echo "$branch" >> $GITHUB_WORKSPACE/failed_branches.txt
+              echo "::endgroup::"
+              return 1
+            }
+            
+            echo "📥 Atualizando $branch com main..."
+            git checkout -B $branch origin/main
+            if ! git push --force-with-lease origin $branch; then
+              echo "⚠️ Failed to sync $branch"
+              echo "$branch" >> $GITHUB_WORKSPACE/failed_branches.txt
+              echo "::endgroup::"
+              return 1
+            fi
+            
+            echo "✅ Successfully synced $branch with main"
+            echo "::endgroup::"
+            return 0
+          }
+
+          echo "🔄 Starting branch synchronization from main..."
+          touch $GITHUB_WORKSPACE/failed_branches.txt
+          
+          for branch in "staging" "dev"; do
+            sync_branch "$branch"
+            echo "---"
+          done
+          
+          echo "📝 Synchronization summary:"
+          if [ -s $GITHUB_WORKSPACE/failed_branches.txt ]; then
+            echo "❌ Failed branches:"
+            cat $GITHUB_WORKSPACE/failed_branches.txt
+            exit 1
+          else
+            echo "✅ All branches synced successfully!"
+          fi
+
+      - name: Sync branches from staging
+        if: github.ref == 'refs/heads/staging'
+        env:
+          GH_TOKEN: ${{ steps.generate_token.outputs.token }}
+        run: |
+          sync_branch() {
+            local branch=$1
+            echo "::group::Syncing $branch with staging..."
+            
+            git fetch origin $branch || {
+              echo "❌ Branch $branch não existe"
+              echo "$branch" >> $GITHUB_WORKSPACE/failed_branches.txt
+              echo "::endgroup::"
+              return 1
+            }
+            
+            echo "📥 Atualizando $branch com staging..."
+            git checkout -B $branch origin/staging
+            if ! git push --force-with-lease origin $branch; then
+              echo "⚠️ Failed to sync $branch"
+              echo "$branch" >> $GITHUB_WORKSPACE/failed_branches.txt
+              echo "::endgroup::"
+              return 1
+            fi
+            
+            echo "✅ Successfully synced $branch with staging"
+            echo "::endgroup::"
+            return 0
+          }
+
+          echo "🔄 Starting branch synchronization from staging..."
+          touch $GITHUB_WORKSPACE/failed_branches.txt
+          
+          for branch in "main" "dev"; do
+            sync_branch "$branch"
+            echo "---"
+          done
+          
+          echo "📝 Synchronization summary:"
+          if [ -s $GITHUB_WORKSPACE/failed_branches.txt ]; then
+            echo "❌ Failed branches:"
+            cat $GITHUB_WORKSPACE/failed_branches.txt
+            exit 1
+          else
+            echo "✅ All branches synced successfully!"
+          fi
+
+      - name: Notify on failure
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ steps.generate_token.outputs.token }}
+          script: |
+            const source_branch = context.ref.replace('refs/heads/', '');
+            const commit_sha = context.sha.substring(0, 7);
+
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `🚨 Falha na sincronização de fix da branch ${source_branch}`,
+              body: `Falha ao sincronizar o fix.
+              
+              Branch: ${source_branch}
+              Commit: ${commit_sha}
+              
+              Por favor, verifique os conflitos e faça a sincronização manualmente.`,
+              labels: ['sync-failed']
+            }); 

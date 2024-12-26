@@ -1,10 +1,15 @@
-name: Build and Deploy to GKE
+name: Deploy to Development
 
 on:
   workflow_dispatch:
   pull_request:
     branches:
-      - "release"
+      - "dev"
+    types:
+      - opened
+      - reopened
+    paths-ignore:
+      - "**.md"
 
 permissions:
   id-token: write
@@ -23,11 +28,30 @@ env:
   DEPLOYMENT_NAME: frontend-site-dev
   REPOSITORY: frontend-site
   IMAGE: frontend-site
-  GCS_BUCKET: staging_promotion_instance
   ARGOCD_SERVER: argocd.wearebren.com
 
 jobs:
+  verify_branch:
+#    name: Dev Branch Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check source branch
+        run: |
+          if [[ "${{ github.event.pull_request.head.ref }}" != "BREN-"* && 
+                "${{ github.event.pull_request.head.ref }}" != *"-hotfix" && 
+                "${{ github.event.pull_request.head.ref }}" != *"-bugfix" ]]; then
+            echo "❌ Pull requests to dev are only allowed from branches named by Jira cards pattern (BREN-XXX)"
+            echo "Current branch: ${{ github.event.pull_request.head.ref }}"
+            exit 1
+          fi
+          echo "✅ Branch verification passed"
   build_and_push:
+#    name: Development Build
+#    if: |
+#      github.event_name == 'pull_request' && 
+#      !startsWith(github.head_ref, 'staging') && 
+#      !startsWith(github.head_ref, 'main')
+    needs: verify_branch
     runs-on: ubuntu-latest
     outputs:
       image_tag: ${{ steps.build_image.outputs.image_tag }}
@@ -37,13 +61,17 @@ jobs:
       commit_sha: ${{ steps.extract_version.outputs.commit_sha }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
+        with:
+          buildkitd-flags: --debug
 
       - name: Log in to Google Cloud
         uses: google-github-actions/auth@v1
@@ -62,34 +90,31 @@ jobs:
         id: extract_version
         run: |
           version=$(grep '^version:' cicd-pipeline/helmcharts/Chart.yaml | cut -d ' ' -f 2)
-          commit_sha=$(echo $GITHUB_SHA | cut -c1-7)
-          echo "version=$version" >> $GITHUB_ENV
-          echo "commit_sha=$commit_sha" >> $GITHUB_ENV
-          echo "::set-output name=version::$version"
-          echo "::set-output name=commit_sha::$commit_sha"
+          commit_sha=$(echo "${GITHUB_SHA::7}")
+          echo "version=${version}" >> $GITHUB_OUTPUT
+          echo "commit_sha=${commit_sha}" >> $GITHUB_OUTPUT
 
       - name: Build and push Docker image
-        id: build_image
-        env:
-          VERSION: ${{ steps.extract_version.outputs.version }}
-          COMMIT_SHA: ${{ steps.extract_version.outputs.commit_sha }}
-        run: |
-          image_repository="${GAR_LOCATION}-docker.pkg.dev/${PROJECT_ID}/${REPOSITORY}/${IMAGE}"
-          image_name="${image_repository}:${VERSION}-${COMMIT_SHA}"
-          image_tag="${VERSION}-${COMMIT_SHA}"
-          echo "Building image with name: $image_name"
-          docker build -t $image_name .
-          docker push $image_name
-          echo "::set-output name=image_tag::$image_tag"
-          echo "::set-output name=image_name::$image_name"
-          echo "::set-output name=image_repository::$image_repository"
-
-      - name: Save image tag to GCS
-        run: |
-          echo "${{ steps.build_image.outputs.image_tag }}" > image_tag.txt
-          gsutil cp image_tag.txt gs://${{ env.GCS_BUCKET }}/${{ env.REPOSITORY }}/image_tag.txt
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: |
+            ${{ env.GAR_LOCATION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.IMAGE }}:${{ steps.extract_version.outputs.version }}-${{ steps.extract_version.outputs.commit_sha }}
+            ${{ env.GAR_LOCATION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.IMAGE }}:buildcache
+          cache-from: |
+            type=registry,ref=${{ env.GAR_LOCATION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.IMAGE }}:buildcache
+          cache-to: |
+            type=registry,ref=${{ env.GAR_LOCATION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.IMAGE }}:buildcache,mode=max
+          platforms: linux/amd64
+          build-args: |
+            BUILDKIT_INLINE_CACHE=1
+          labels: |
+            org.opencontainers.image.revision=${{ github.sha }}
+            org.opencontainers.image.created=${{ steps.prep.outputs.created }}
 
   deploy:
+#    name: Development Deploy
     needs: build_and_push
     runs-on: ubuntu-latest
     env:
@@ -99,34 +124,36 @@ jobs:
       COMMIT_SHA: ${{ needs.build_and_push.outputs.commit_sha }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Set up ArgoCD CLI
         uses: clowdhaus/argo-cd-action@main
         with:
           version: 2.6.7
 
-      - name: Add SSH key
+      - name: Set up SSH Agent and Add SSH Key
         run: |
           mkdir -p ~/.ssh
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
+          eval "$(ssh-agent -s)"
+          ssh-add ~/.ssh/id_rsa
           ssh-keyscan github.com >> ~/.ssh/known_hosts
 
       - name: Deploy to ArgoCD
         run: |
           argocd app create --upsert \
-            --server argocd.wearebren.com \
+            --server ${ARGOCD_SERVER} \
             --name ${DEPLOYMENT_NAME} \
             --project default \
-            --helm-set image.repository=${IMAGE_REPOSITORY} \
             --helm-set image.tag=${VERSION}-${COMMIT_SHA} \
             --dest-name gke_${CLUSTER_PROJECT_ID}_${GKE_ZONE}_${GKE_CLUSTER} \
-            --repo git@github.com:fynt-io/${REPOSITORY}.git \
+            --repo git@github.com:fynt-io/frontend-site.git \
             --path cicd-pipeline/helmcharts \
             --values-literal-file cicd-pipeline/helmcharts/values-dev.yaml \
             --dest-namespace ${REPOSITORY} \
             --sync-option CreateNamespace=true \
             --sync-policy none \
+            --revision dev \
             --insecure
           argocd app sync ${DEPLOYMENT_NAME} --server $ARGOCD_SERVER --insecure
